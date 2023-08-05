@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { db, storage } from '../config/firebase';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { addDoc, collection } from 'firebase/firestore';
+import { addDoc, collection, Timestamp } from 'firebase/firestore';
 
 import './css/UserForm.scss';
 
@@ -32,12 +32,12 @@ const UserForm = () => {
 
       // Save data to Firebase
       const profilePicRef = profilePic && storage.ref().child(`profile_pics/${profilePic.name}`);
-      const dobTimestamp = dob && db.Timestamp.fromDate(dob);
+      const dobTimestamp = dob && Timestamp.fromDate(dob) //db.Timestamp.fromDate(dob);
 
       const userDoc = {
-        name,
-        phoneNumber,
-        email,
+        name: name,
+        phoneNumber :phoneNumber,
+        email : email,
         profilePicUrl: profilePic && (await profilePicRef.put(profilePic)).downloadURL,
         dob: dobTimestamp,
       };
