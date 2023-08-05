@@ -1,0 +1,48 @@
+// For example, in UserForm.scss
+
+@import '../../styles/colors.scss';
+
+/* Basic styling for the form container */
+.user-form-container {
+  display: flex;
+  flex-direction: column;
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #fff;
+}
+
+/* Styling for the form inputs and labels */
+.user-form-container label {
+  margin-bottom: 8px;
+  font-weight: bold;
+}
+
+.user-form-container input {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-bottom: 16px;
+}
+
+/* Styling for the submit button */
+.user-form-container button {
+  padding: 10px 20px;
+  background-color: #ff6666; /* Striking color */
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.user-form-container button:hover {
+  background-color: #ff9999; /* Lighten the striking color on hover */
+}
+
+/* Optional hover animation for form inputs */
+.user-form-container input:hover {
+  background-color: #f7f7f7; /* Lighten the background on hover */
+  transition: background-color 0.3s ease;
+}

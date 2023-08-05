@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { db, storage } from '../config/firebase'; // Import the firebase configuration file
-import { deleteDoc, doc } from 'firebase/firestore';
+import { deleteDoc, doc, onSnapshot, collection, updateDoc } from 'firebase/firestore';
+
+import './css/FirebasePage.scss';
 
 const FirebasePage = () => {
   const [users, setUsers] = useState([]);
+  const usersCollectionRef = collection(db, "users");
 
   useEffect(() => {
     // Load data from Firebase when the component mounts
-    const unsubscribe = db.collection('users').onSnapshot((snapshot) => {
+    const unsubscribe = onSnapshot(usersCollectionRef,(snapshot) => {
       const fetchedUsers = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
       setUsers(fetchedUsers);
     });
@@ -26,19 +29,20 @@ const FirebasePage = () => {
   };
 
   const handleEdit = async (userId, updatedUserData) => {
+    const userDoc = doc(db, "users", userId);
     try {
       // Update the user data in Firebase
-      await db.collection('users').doc(userId).update(updatedUserData);
+      await updateDoc(userDoc, updatedUserData);
     } catch (error) {
       console.error('Error updating data:', error);
     }
   };
 
   return (
-    <div>
-      <h2>Firebase Data</h2>
+    <div className='firebase-container'>
+      <h2 className='heading'>Firebase Data</h2>
       {users.map((user) => (
-        <div key={user.id}>
+        <div key={user.id} className='user-card'>
           <p>Name: {user.name}</p>
           <p>Phone Number: {user.phoneNumber}</p>
           <p>Email: {user.email}</p>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import './css/LocalStoragePage.scss';
 
 const LocalStoragePage = () => {
   const [users, setUsers] = useState([]);
@@ -26,10 +27,10 @@ const LocalStoragePage = () => {
   };
 
   return (
-    <div>
-      <h2>Local Storage Data</h2>
+    <div className='local-storage-container'>
+      <h2 className='heading'>Local Storage Data</h2>
       {users.map((user, index) => (
-        <div key={index}>
+        <div key={index} className='user-card'>
           <p>Name: {user.name}</p>
           <p>Phone Number: {user.phoneNumber}</p>
           <p>Email: {user.email}</p>

@@ -4,6 +4,9 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { addDoc, collection } from 'firebase/firestore';
 
+import './css/UserForm.scss';
+
+
 const UserForm = () => {
   const [name, setName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -52,7 +55,7 @@ const UserForm = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} className='user-form-container'>
       {/* Name Input */}
       <label htmlFor="name">Name</label>
       <input type="text" id="name" value={name} onChange={(e) => setName(e.target.value)} required />
