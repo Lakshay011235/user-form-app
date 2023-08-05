@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { db, storage } from '../config/firebase'; // Import the firebase configuration file
-import { deleteDoc, doc, onSnapshot, collection, updateDoc } from 'firebase/firestore';
+import { getDoc, deleteDoc, doc, onSnapshot, collection, updateDoc } from 'firebase/firestore';
 
 import './css/FirebasePage.scss';
+import { ref, deleteObject } from 'firebase/storage';
 
 const FirebasePage = () => {
   const [users, setUsers] = useState([]);
@@ -20,11 +21,21 @@ const FirebasePage = () => {
   }, []);
 
   const handleDelete = async (userId) => {
-    try {
-      // Delete the user data from Firebase
-      await deleteDoc(doc(db, "users", userId));
-    } catch (error) {
-      console.error('Error deleting data:', error);
+    // Fetch the user data from Firestore
+    const userRef = doc(db, "users", userId);
+    const userSnap = await getDoc(userRef);
+    const userData = userSnap.data();
+
+    // Delete the user data from Firestore
+    await deleteDoc(userRef);
+
+    // If a profile picture URL exists, delete the corresponding file from Firebase Storage
+    if (userData && userData.profilePicUrl) {
+      // Create a reference to the profile picture file
+      const profilePicRef = ref(storage, userData.profilePicUrl);
+
+      // Delete the file from Storage
+      await deleteObject(profilePicRef);
     }
   };
 

@@ -3,7 +3,8 @@ import { db, storage } from '../config/firebase';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { addDoc, collection, Timestamp } from 'firebase/firestore';
-
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { v4 } from 'uuid';
 import './css/UserForm.scss';
 
 
@@ -12,37 +13,47 @@ const UserForm = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [email, setEmail] = useState('');
   const [profilePic, setProfilePic] = useState(null);
+  const [profilePicUrl, setProfilePicUrl] = useState(null);
   const [dob, setDob] = useState(null);
   const usersCollectionRef = collection(db, "users");
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
-      // Save data to local storage
-      const userData = {
-        name,
-        phoneNumber,
-        email,
-        profilePic: profilePic && profilePic.name,
-        dob: dob && dob.toISOString(),
-      };
-      const users = JSON.parse(localStorage.getItem('users')) || [];
-      users.push(userData);
-      localStorage.setItem('users', JSON.stringify(users));
-
       // Save data to Firebase
-      const profilePicRef = profilePic && storage.ref().child(`profile_pics/${profilePic.name}`);
-      const dobTimestamp = dob && Timestamp.fromDate(dob) //db.Timestamp.fromDate(dob);
+      const profilePicRef = ref(storage, `profile_pics/${profilePic.name + v4()}`);
+      await uploadBytes(profilePicRef, profilePic).then((snapshot) => {
+        getDownloadURL(snapshot.ref).then((url) => {
+          // Save data to local storage
+          const userData = {
+            name,
+            phoneNumber,
+            email,
+            profilePic: profilePic && profilePic.name,
+            dob: dob && dob.toISOString(),
+          };
 
-      const userDoc = {
-        name: name,
-        phoneNumber :phoneNumber,
-        email : email,
-        profilePicUrl: profilePic && (await profilePicRef.put(profilePic)).downloadURL,
-        dob: dobTimestamp,
-      };
-      await addDoc(usersCollectionRef, userDoc);
+          setProfilePicUrl(url);
+          setProfilePic(url);
+          
+          const users = JSON.parse(localStorage.getItem('users')) || [];
+          users.push(userData);
+          localStorage.setItem('users', JSON.stringify(users));
 
+          // Create the userDoc object inside the getDownloadURL callback
+          const dobTimestamp = dob && Timestamp.fromDate(dob);
+
+          let userDoc = {
+            name,
+            phoneNumber,
+            email,
+            profilePicUrl: url, // Use the updated profilePicUrl from the callback
+            dob: dobTimestamp,
+          };
+
+          // Save userDoc to Firestore
+          addDoc(usersCollectionRef, userDoc);
+        }).catch((error) => {console.error('Error getting download URL:', error);});
+      });
       // Clear the form after submission
       setName('');
       setPhoneNumber('');
